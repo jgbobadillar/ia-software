@@ -1,13 +1,21 @@
 from flask import Flask
+from flask import request
 import requests
-
+import os
 
 app=Flask(__name__)
 
-@app.route("/credit/predict")
+ip_ai_server = os.getenv("IA_IP") or "127.0.0.1"
+
+@app.route("/credit/predict", methods=['POST'])
 def predict():
-    response = requests.post("http://127.0.0.1:5000/servicioia", 
-                        json={"age": 23, "housing": "rent","credit_amount": 1000})
+    content = request.get_json()
+    age = content['age']
+    housing = content['housing']
+    credit_amount = content['credit_amount'] 
+
+    response = requests.post(f"http://{ip_ai_server}:5000/servicioia", 
+                        json={"age": age, "housing": housing,"credit_amount": credit_amount})
     print("ia responde", response.json())
     return {"prediction": response.json()}
 
