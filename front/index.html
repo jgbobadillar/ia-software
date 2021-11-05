@@ -1,0 +1,89 @@
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<div id="app">
+<div>
+Nombre: <input type="text" v-model="nombre" /> 
+</div>
+
+<div>
+Edad: <input type="text"  v-model="age" />
+</div>
+
+<div>
+Tipo Priopietario:
+<select v-model="housing">
+<option value="free">Ninguna</option>
+<option value="rent">En arriendo</option>
+<option value="own">Propietario</option>
+</select>
+</div>
+
+<div>
+Valor del prestamo: <input type="text" v-model="credit_amount" />
+</div>
+
+<div>
+{{message}}
+</div>
+
+<div>
+<button v-on:click="clickme">Aceptar</button>
+</div>
+
+</div>
+
+<script>
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    nombre: '',
+    credit_amount: '',
+    age: '',
+    housing: '',
+    message: ''
+  },
+  methods: {
+   clickme: function(){
+      let that = this;
+      console.log(this.nombre);
+      console.log(this.age);     
+      console.log(this.housing);
+      console.log(this.credit_amount);
+ 
+     axios.post('http://127.0.0.1:8080/credit/predict/v2',
+      {"nombre": this.nombre, "age": this.age, "housing": this.housing, "credit_amount": this.credit_amount})
+
+      .then(function(response){
+         console.log(response);
+         if(response['data']['good_client']){
+             text = "Apreciado " + response['data']['nombre']+ " su credito por " + response['data']['credit_amount'] + " ha sido aprobado. Tiene una probabilidad de " 
+               + response['data']['proba'] + " de pagar el préstamo";
+         }else{
+          text = "Apreciado " + response['data']['nombre']+ " su credito no ha sido aprobado"
+          + "Tiene una probabilidad de " + response['data']['proba'] + "de no pagar el préstamo";
+
+         }
+
+         that.message = text;
+
+      } 
+
+      );
+   },
+
+  }
+
+})
+</script>
+
+
+
+
+
+
+
+
+
+
